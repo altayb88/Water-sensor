@@ -1,0 +1,63 @@
+// Libraries
+#include <LiquidCrystal.h>
+
+// Pinout
+const int sensorPin = A0;
+const int redLED = 7;
+const int greenLED = 8;
+
+// Initialize LCD
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+ // Start serial communication
+ Serial.begin(9600);
+
+ // Initialize pins
+ pinMode(sensorPin, INPUT);
+ pinMode(redLED, OUTPUT);
+ pinMode(greenLED, OUTPUT);
+
+ // Set up the LCD
+ lcd.begin(16, 2);
+}
+
+void loop() {
+ // Read the value from the sensor
+ int sensorValue = analogRead(sensorPin);
+
+ // Calculate the water level
+ float waterLevel = (float)sensorValue / 1023.0 * 100.0;
+
+ // Display the water level on the LCD
+ lcd.setCursor(0, 0);
+ lcd.print("Water Level: ");
+ lcd.print(waterLevel);
+ lcd.print("%");
+
+ // Display the status of the tank on the LCD
+ if (waterLevel <= 5.0) {
+    lcd.setCursor(0, 1);
+    lcd.print("Status: EMPTY ");
+
+    // Turn on the red LED and turn off the green LED
+    digitalWrite(redLED, HIGH);
+    digitalWrite(greenLED, LOW);
+ }
+ else {
+    lcd.setCursor(0, 1);
+    lcd.print("Status: COMPLETE ");
+
+    // Turn on the green LED and turn off the red LED
+    digitalWrite(greenLED, HIGH);
+    digitalWrite(redLED, LOW);
+ }
+
+ // Print the water level on the serial monitor
+ Serial.print("Water Level: ");
+ Serial.print(waterLevel);
+ Serial.println("%");
+
+ // Wait for a second before checking again
+ delay(1000);
+}
